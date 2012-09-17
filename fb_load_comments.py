@@ -49,6 +49,38 @@ def buildSelectStatement(objectId,limit,offset):
 
 	return selectStatement
 
+def sendDocumentToSolr(comment):
+	dateTimeFormat = '%Y-%m-%dT%H:%M:%SZ'
+	created_time = datetime.fromtimestamp(long(comment['time'])).strftime(dateTimeFormat)
+
+	try:
+		print "send it to solr"
+		
+		s.add(
+			in_reply_to_object_id=objectId,
+			user_id=comment['fromid'],
+			name=comment['username'],
+			like_count=comment['likes'],
+			id=comment['id'],
+			created_at=created_time,
+			text_length_i=len(comment['text']),
+			text=comment['text']);
+
+	except solr.core.SolrException as solrerror:
+		print "OUCH !! Something bad happened Larry!" 
+		print solrerror
+
+
+def printComment(comment):
+	print "id: " 		+ comment['id']
+	print "user id: " 	+ str(comment['fromid'])
+	print "text: " 		+ comment['text']
+	print "timestamp: " +  datetime.fromtimestamp(long(comment['time']))
+	print "likes: " 	+ str(comment['likes'])
+	print "--------------------------------------------"
+
+
+
 def loadFacebookCommentsFromObjectId(objectId,limit=999,offset=0):
 	print "- objectId : " + str(objectId)
 	print "- limit : " + str(limit) 
@@ -68,36 +100,15 @@ def loadFacebookCommentsFromObjectId(objectId,limit=999,offset=0):
 			for comment in comments:
 				global _total
 				_total += + 1
+
+				#just for debug
 				print str(_total)
 				
-				dateTimeFormat = '%Y-%m-%dT%H:%M:%SZ'
-				created_time = datetime.fromtimestamp(long(comment['time'])).strftime(dateTimeFormat)
-
-				print "id: " 		+ comment['id']
-				print "user id: " 	+ str(comment['fromid'])
-				print "text: " 		+ comment['text']
-				print "timestamp: " +  created_time
-				print "likes: " 	+ str(comment['likes'])
-				print "--------------------------------------------"
+				printComment(comment)
 
 				if(_solr_address != None):
 					#send it to solr
-					try:
-						print "send it to solr"
-						
-						s.add(
-							in_reply_to_object_id=objectId,
-							user_id=comment['fromid'],
-							name=comment['username'],
-							like_count=comment['likes'],
-							id=comment['id'],
-							created_at=created_time,
-							text_length_i=len(comment['text']),
-							text=comment['text']);
-
-					except solr.core.SolrException as solrerror:
-						print "OUCH !! Something bad happened Larry!" 
-						print solrerror
+					sendDocumentToSolr(comment)
 			
 			next_offset = offset + _page_size
 			print "Loading next page..."
