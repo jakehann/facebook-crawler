@@ -75,7 +75,7 @@ def printComment(comment):
 	print "id: " 		+ comment['id']
 	print "user id: " 	+ str(comment['fromid'])
 	print "text: " 		+ comment['text']
-	print "timestamp: " +  datetime.fromtimestamp(long(comment['time']))
+	print "timestamp: " +  str(datetime.fromtimestamp(long(comment['time'])))
 	print "likes: " 	+ str(comment['likes'])
 	print "--------------------------------------------"
 
