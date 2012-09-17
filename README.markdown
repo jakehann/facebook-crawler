@@ -31,7 +31,7 @@ Using [Facebook Graph API](https://developers.facebook.com/docs/reference/api/) 
 	  -S SOLR_ADDRESS, --Solr=SOLR_ADDRESS
 	                        Solr Address (optional)
 
-*Getting Facebook object id*
+**Getting Facebook object id**
 
 From a Facebook post with the following link https://www.facebook.com/photo.php?fbid=10151165605121749&set=a.53081056748.66806.6815841748&type=1&theater the Facebook Object Id in this case is 10151165605121749 represented by fbid parameter on the URL.
 
