@@ -9,7 +9,7 @@ Using [Facebook Graph API](https://developers.facebook.com/docs/reference/api/) 
 **Basic Usage**
 
 Help message.
-::
+
 	./fb_load_comments.py -h
 
 	  Options:
@@ -36,7 +36,7 @@ Help message.
 *Getting Facebook object id*
 From a Facebook post with the following link https://www.facebook.com/photo.php?fbid=10151165605121749&set=a.53081056748.66806.6815841748&type=1&theater the Facebook Object Id in this case is 10151165605121749 represented by fbid parameter on the URL.
 
-::
+
 	./fb_load_comments.py -F 10151165605121749
 
 **Authentication**
@@ -45,11 +45,10 @@ In order to get more results you must provide an OAuth access token. You can get
 **Indexing**
 Its possible to index the comments on [Apache Solr](http://lucene.apache.org/solr/).
 
-::
 	./fb_load_comments.py -F 10151165605121749 -S http://localhost:8983/solr
 
 Your Solr schema.xml must be something like this :
-::	
+
 	<fields>   
 		<field name="id" 	type="string"	indexed="true" stored="true" required="true"/>
 		<field name="user_id"	type="string"	indexed="true" stored="true"/>
