@@ -18,11 +18,11 @@ from pprint import pprint
 
 # Command Line Arguments Parser
 cmd_parser = OptionParser(version="%prog 0.1")
-cmd_parser.add_option("-T", "--OAuthToken", 		type="string", 	action="store", dest="oauth_access_token", help="Facebook OAuth Access Token (You can get your on here https://developers.facebook.com/tools/explorer/)")
+cmd_parser.add_option("-T", "--OAuthToken", 		type="string", 	action="store", dest="oauth_access_token", help="Facebook OAuth Access Token (You can get your on here https://developers.facebook.com/tools/explorer/) (optional)")
 cmd_parser.add_option("-F", "--FacebookObjectId", 	type="string", 	action="store", dest="facebook_object_id", help="Facebook Object Id. You can find more about it here https://developers.facebook.com/docs/reference/api/")
-cmd_parser.add_option("-L", "--PageSize", 			type="int", 	action="store", dest="page_size", help="Pagination size (1-999)", default=500)
-cmd_parser.add_option("-O", "--Offset", 			type="int", 	action="store", dest="offset", help="Pagination offset",default=0)
-cmd_parser.add_option("-S", "--Solr", 				type="string", 	action="store", dest="solr_address", help="Solr Address")
+cmd_parser.add_option("-L", "--PageSize", 			type="int", 	action="store", dest="page_size", help="Pagination size (1-999) (optional)", default=500)
+cmd_parser.add_option("-O", "--Offset", 			type="int", 	action="store", dest="offset", help="Pagination offset (optional)",default=0)
+cmd_parser.add_option("-S", "--Solr", 				type="string", 	action="store", dest="solr_address", help="Solr Address (optional)")
 
 (cmd_options, cmd_args) = cmd_parser.parse_args()
 
@@ -37,7 +37,7 @@ _access_token 		= cmd_options.oauth_access_token
 _facebook_object_id = cmd_options.facebook_object_id
 _solr_address 		= cmd_options.solr_address
 
-# local variables
+# global variables
 _total = 0
 _startTime = datetime.now()
 
@@ -70,12 +70,9 @@ def loadFacebookCommentsFromObjectId(objectId,limit=999,offset=0):
 				_total += + 1
 				print str(_total)
 				
-				#print comment.keys()
 				dateTimeFormat = '%Y-%m-%dT%H:%M:%SZ'
 				created_time = datetime.fromtimestamp(long(comment['time'])).strftime(dateTimeFormat)
 
-				userName = "unknown"
-				
 				print "id: " 		+ comment['id']
 				print "user id: " 	+ str(comment['fromid'])
 				print "text: " 		+ comment['text']
@@ -83,30 +80,23 @@ def loadFacebookCommentsFromObjectId(objectId,limit=999,offset=0):
 				print "likes: " 	+ str(comment['likes'])
 				print "--------------------------------------------"
 
-				is_short_text = True
-
-				if len(comment['text']) >= 300:
-					is_short_text = False
-
 				if(_solr_address != None):
 					#send it to solr
 					try:
 						print "send it to solr"
 						
-						s.add(	parent_id=objectId,
+						s.add(
 							in_reply_to_object_id=objectId,
 							user_id=comment['fromid'],
 							name=comment['username'],
 							like_count=comment['likes'],
 							id=comment['id'],
 							created_at=created_time,
-							version=11,
-							isshort_b=is_short_text,
 							text_length_i=len(comment['text']),
 							text=comment['text']);
 
 					except solr.core.SolrException as solrerror:
-						print "OUCH !! Something bad happened Larry" 
+						print "OUCH !! Something bad happened Larry!" 
 						print solrerror
 			
 			next_offset = offset + _page_size
@@ -122,8 +112,6 @@ def loadFacebookCommentsFromObjectId(objectId,limit=999,offset=0):
 	print "Start at " + _startTime.ctime()
 	print "Finished at " + now.ctime()
 	print "Total of collected comments : " + str(_total)
-
-
 
 # Initialize the Graph API with a valid access token (optional, but will allow you to do all sorts of fun stuff).
 graph = GraphAPI(_access_token)
